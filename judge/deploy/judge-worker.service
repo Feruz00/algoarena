@@ -1,0 +1,19 @@
+[Unit]
+Description=Online judge worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# isolate needs root (or a setuid isolate binary)
+User=root
+WorkingDirectory=/opt/judge-system
+EnvironmentFile=/opt/judge-system/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/worker.js
+Restart=always
+RestartSec=3
+# give running submissions time to finish on stop
+TimeoutStopSec=120
+
+[Install]
+WantedBy=multi-user.target

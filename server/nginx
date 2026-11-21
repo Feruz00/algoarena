@@ -1,0 +1,69 @@
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 100M;
+    keepalive_timeout 100;
+    sendfile on;
+
+    # Redirect /admin to /admin/
+    location = /admin {
+        return 301 /admin/;
+    }
+
+    # Redirect admin login to the client login page
+    location = /admin/login {
+        return 301 /login;
+    }
+
+    # Admin React application
+    location ^~ /admin/ {
+        root /home/user/projects/judge;
+        index index.html;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    # Uploaded files
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    location /socket.io/ {
+    proxy_pass http://127.0.0.1:3001;
+    proxy_http_version 1.1;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+}
+
+    # Client React application
+    location / {
+        root /home/user/projects/judge/client;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+}

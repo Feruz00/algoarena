@@ -1,0 +1,6 @@
+34|judge-s | submission 2273 failed: [Error: ENOENT: no such file or directory, open '/var/local/lib/isolate/4/box/input.txt'] {
+34|judge-s |   errno: -2,
+34|judge-s |   code: 'ENOENT',
+34|judge-s |   syscall: 'open',
+34|judge-s |   path: '/var/local/lib/isolate/4/box/input.txt'
+34|judge-s | }

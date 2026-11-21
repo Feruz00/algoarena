@@ -1,0 +1,286 @@
+<template>
+  <PageHeader
+    pageName="Çäreler bölümi"
+    btnName="Täze çäre goş"
+    btnHref="events-create"
+    :selectedRows="selectedRows"
+    :isDeleteSources="isDeletePosts"
+    :isSuccess="isSuccess"
+    :filteredTagsCount="isSuccess ? data.count : 0"
+    @delete="deleteRowSelections"
+  >
+  </PageHeader>
+  <Error v-if="isError" :error="error" />
+  <template v-else-if="!isError">
+    <section class="bg-white shadow">
+      <a-table
+        :dataSource="data?.data || []"
+        :loading="isFetching"
+        :pagination="false"
+        class="text-sm"
+        rowKey="id"
+        bordered
+        @change="onTableChange"
+        @row-click="handleRowClick"
+        :scroll="{ x: 'max-content', y: '650px' }"
+        :row-selection="rowSelection"
+      >
+        <a-table-column title="T/b" key="index" fixed="left" width="6rem">
+          <template #default="{ index }">
+            {{ (currentPage - 1) * pageSize + (index + 1) }}
+          </template>
+        </a-table-column>
+        <a-table-column dataIndex="titleTm" width="18rem" fixed="left" title="Sözbaşy">
+          <template #default="{ text }">
+            <div class="line-clamp-2 break-all">
+              {{ text }}
+            </div>
+          </template>
+        </a-table-column>
+        <a-table-column dataIndex="contentTm" width="18rem" title="Mazmuny">
+          <template #default="{ text }">
+            <div class="line-clamp-2 break-all" v-html="text"></div>
+          </template>
+        </a-table-column>
+        <a-table-column
+          title="Senesi"
+          width="8rem"
+          dataIndex="createdAt"
+          :sorter="true"
+          :sortOrder="sortField === 'createdAt' ? sortOrder : null"
+        >
+          <template #default="{ text }">
+            {{ dayjs(new Date(text)).format('DD.MM.YYYY HH:mm') }}
+          </template>
+        </a-table-column>
+
+        <a-table-column
+          title="Status"
+          width="8rem"
+          dataIndex="status"
+          :filters="[
+            { text: 'Esasy sanaw', value: 'active' },
+            { text: 'Garalama', value: 'deactive' },
+          ]"
+          :filteredValue="status"
+          :filterMultiple="false"
+        >
+          <template #default="{ text }">
+            <a-button class="cursor-default" v-if="text === 'active'" size="small" type="primary">
+              Esasy sanaw
+            </a-button>
+            <a-button v-else size="small" class="bg-gray-600 text-white cursor-default">
+              Garalama
+            </a-button>
+          </template>
+        </a-table-column>
+        <a-table-column title="Sazlamalar" width="7rem" dataIndex="id" key="id" fixed="right">
+          <template #default="{ text }">
+            <div class="flex flex-row items-center gap-2 text-base select-none">
+              <EyeOutlined class="cursor-pointer" @click="viewId = text" />
+
+              <router-link
+                :to="{ name: 'events-update', params: { id: text } }"
+                class="flex items-center justify-center"
+              >
+                <EditOutlined class="cursor-pointer" />
+              </router-link>
+
+              <a-popconfirm
+                placement="leftTop"
+                title="Habaryň maglumatlaryny pozmakçymy?"
+                ok-text="Yes"
+                cancel-text="No"
+                :loading="isDeletePending"
+                @confirm="() => handleDelete(text)"
+              >
+                <DeleteOutlined class="cursor-pointer" />
+              </a-popconfirm>
+            </div>
+          </template>
+        </a-table-column>
+      </a-table>
+    </section>
+    <div
+      class="bg-white mt-3 py-2 px-3 rounded shadow flex flex-row items-center justify-end gap-4"
+    >
+      <div class="flex flex-row items-center gap-2">
+        <a-pagination
+          :total="isSuccess ? data.count : 0"
+          @change="onChange"
+          show-size-changer
+          :current="currentPage"
+          :pageSize="pageSize"
+          :pageSizeOptions="['20', '50', '75', '100']"
+          :show-total="(total) => `Jemi: ${total} sany`"
+        />
+      </div>
+    </div>
+
+    <ViewEvent :id="viewId" @close="viewId = null" />
+  </template>
+</template>
+<script setup>
+import PageHeader from '@/components/PageHeader.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import dayjs from 'dayjs'
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons-vue'
+
+import { useDeleteEvent, useDeleteEvents, useGetEvents } from './useEvents'
+import ViewEvent from './ViewEvent.vue'
+
+const route = useRoute()
+const router = useRouter()
+
+const pageSize = ref(Number(route.query.limit) || 20)
+const currentPage = ref(Number(route.query.page) || 1)
+const viewId = ref(null)
+
+const selectedRows = ref([]) // Tracks selected row IDs
+const selectAll = ref(false)
+
+const sortField = ref(route.query?.sort ?? '')
+const sortOrder = ref(route.query?.order ?? '')
+
+const filterType = ref(route.query?.type ? route.query?.type.split(',') : [])
+const status = ref(route.query?.status ? route.query?.status.split(',') : [])
+
+const queryKey = computed(() => ({
+  page: currentPage.value,
+  limit: pageSize.value,
+  sort: sortField.value ? sortField.value : undefined,
+  order: sortOrder.value ? (sortOrder.value === 'ascend' ? 'asc' : 'desc') : undefined,
+  type: filterType.value.length > 0 ? filterType.value.join(',') : undefined,
+  status: status.value.length > 0 ? status.value.join(',') : undefined,
+}))
+const { isLoading, isFetching, isSuccess, data, error, isError } = useGetEvents(queryKey)
+
+const { mutate: deleteItem, isPending: isDeletePending } = useDeleteEvent()
+const { mutate: deletePosts, isPending: isDeletePosts } = useDeleteEvents()
+
+const onTableChange = (pagination, filter, sorter, extra) => {
+  let query = {}
+  let hasChanges = false
+
+  if (sorter?.field && sorter?.order) {
+    if (sortField.value !== sorter.field || sortOrder.value !== sorter.order) {
+      sortField.value = sorter.field
+      sortOrder.value = sorter.order
+      query.sort = sorter.field
+      query.order = sorter.order === 'ascend' ? 'asc' : 'desc'
+      hasChanges = true
+    }
+  } else {
+    if (sortField.value || sortOrder.value) {
+      sortField.value = ''
+      sortOrder.value = ''
+      query.sort = undefined
+      query.order = undefined
+      hasChanges = true
+    }
+  }
+
+  if (JSON.stringify(status.value) !== JSON.stringify(filter.status || null)) {
+    status.value = filter.status || []
+    hasChanges = true
+  }
+
+  if (status.value) {
+    query.status = status.value.join(',')
+  } else {
+    query.status = undefined
+  }
+
+  if (JSON.stringify(filterType.value) !== JSON.stringify(filter.type || [])) {
+    filterType.value = filter.type || []
+    hasChanges = true
+  }
+
+  if (filterType.value) {
+    query.type = filterType.value.join(',')
+  } else {
+    query.type = undefined
+  }
+
+  if (hasChanges) {
+    currentPage.value = 1
+    query.page = 1
+    addQuery(query)
+  }
+}
+
+const onChange = (page, limit) => {
+  const query = route.query
+  if (limit !== pageSize.value) {
+    pageSize.value = limit
+    currentPage.value = 1
+  } else if (page !== currentPage.value) {
+    currentPage.value = page
+  }
+
+  router.push({
+    query: {
+      ...query,
+      page: currentPage.value,
+      limit: limit,
+    },
+  })
+}
+
+const handleDelete = (id) => {
+  deleteItem(id)
+}
+const rowSelection = ref({
+  checkStrictly: false,
+  onChange: (selectedRowKeys, rows) => {
+    selectedRows.value = rows.map((row) => row.id)
+  },
+})
+
+const deleteRowSelections = () => {
+  deletePosts(selectedRows.value, {
+    onSuccess: () => {
+      selectedRows.value = []
+    },
+  })
+}
+
+const addQuery = (query) => {
+  const q = { ...route.query, ...query }
+
+  Object.keys(q).forEach((key) => {
+    if (!q[key]) {
+      delete q[key]
+    }
+  })
+
+  router.push({ query: q })
+}
+const queryReload = () => {
+  if (route.query.type) {
+    filterType.value = route.query.type.split(',')
+  } else {
+    filterType.value = []
+  }
+
+  if (route.query.status) {
+    status.value = route.query.status.split(',')
+  } else {
+    status.value = []
+  }
+}
+watch(() => route.query, queryReload)
+
+onMounted(() => {
+  document.title = 'Admin | Çäreler'
+  queryReload()
+})
+</script>
+<style scoped>
+:deep(.ant-table),
+:deep(.ant-form),
+:deep(.ant-form-item) {
+  font-size: 90%;
+}
+</style>

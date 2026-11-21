@@ -1,0 +1,28 @@
+{
+  "submissionId": "tle-cpp17",
+  "code": "int main() { volatile long long x = 0; while (true) x++; }\n",
+  "lang": "cpp17",
+  "time": 1000,
+  "memory": 256,
+  "type": "exact",
+  "testgroup": {
+    "id": 1,
+    "testcases": [
+      {
+        "id": 1,
+        "input": "1 2\n",
+        "expectedOutput": "3\n"
+      },
+      {
+        "id": 2,
+        "input": "-5 5\n",
+        "expectedOutput": "0\n"
+      },
+      {
+        "id": 3,
+        "input": "1000000000 2000000000\n",
+        "expectedOutput": "3000000000\n"
+      }
+    ]
+  }
+}

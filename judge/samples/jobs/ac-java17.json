@@ -1,0 +1,28 @@
+{
+  "submissionId": "ac-java17",
+  "code": "import java.util.*;\npublic class Main {\n    public static void main(String[] args) {\n        Scanner s = new Scanner(System.in);\n        long a = s.nextLong(), b = s.nextLong();\n        System.out.println(a + b);\n    }\n}\n",
+  "lang": "java17",
+  "time": 1000,
+  "memory": 256,
+  "type": "exact",
+  "testgroup": {
+    "id": 1,
+    "testcases": [
+      {
+        "id": 1,
+        "input": "1 2\n",
+        "expectedOutput": "3\n"
+      },
+      {
+        "id": 2,
+        "input": "-5 5\n",
+        "expectedOutput": "0\n"
+      },
+      {
+        "id": 3,
+        "input": "1000000000 2000000000\n",
+        "expectedOutput": "3000000000\n"
+      }
+    ]
+  }
+}

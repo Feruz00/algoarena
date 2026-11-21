@@ -1,0 +1,18 @@
+{
+  "name": "judge-system",
+  "version": "1.0.0",
+  "description": "Online judge worker: RabbitMQ in, Kafka out, sandboxed execution (docker / isolate)",
+  "main": "src/worker.js",
+  "scripts": {
+    "start": "node src/worker.js",
+    "dev": "node --watch src/worker.js",
+    "test": "node --test",
+    "judge-local": "node scripts/judge-local.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "dotenv": "^16.4.5",
+    "kafkajs": "^2.2.4"
+  }
+}

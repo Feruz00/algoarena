@@ -1,0 +1,12 @@
+{
+  "name": "judge-backend-example",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "express": "^4.19.2",
+    "kafkajs": "^2.2.4",
+    "socket.io": "^4.7.5"
+  }
+}
