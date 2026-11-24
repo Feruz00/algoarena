@@ -1,0 +1,88 @@
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 100M;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    keepalive_timeout 65;
+    keepalive_requests 1000;
+
+    # Admin redirects
+    location = /admin {
+        return 301 /admin/;
+    }
+
+    location = /admin/login {
+        return 301 /login;
+    }
+
+    # Admin React application
+    location ^~ /admin/ {
+        root /home/user/projects/judge;
+        index index.html;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    # Socket.IO
+    location /socket.io/ {
+        proxy_pass http://judge_backend;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_buffering off;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+
+    # Uploaded files
+    location /uploads/ {
+        proxy_pass http://judge_backend;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 120s;
+    }
+
+    # Backend API
+    location ^~ /api/ {
+        proxy_pass http://judge_backend;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Connection "";
+
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+    }
+
+    # Client React application
+    location / {
+        root /home/user/projects/judge/client;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+}

@@ -129,6 +129,7 @@ const createSubmission = catchAsync(async (req, res, next) => {
   job.problemId = problem.id;
   job.username = req.user.username;
   // job.contestId = req.body?.contestId;
+  console.log(job);
   await sendSubmission(job);
 
   return res.json({});

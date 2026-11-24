@@ -64,6 +64,7 @@ const runKafka = async () => {
             console.warn("[Kafka] Missing data:", ev);
             return;
           }
+          // console.log(ev);
 
           // console.log(ev);
           const data = await Submissions.findOne({

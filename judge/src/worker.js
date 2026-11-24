@@ -56,6 +56,7 @@ async function main() {
     let job;
     try {
       job = JSON.parse(msg.content.toString());
+      console.log("job geldi:", job);
     } catch {
       console.error("dropping malformed message");
       return ch.ack(msg);

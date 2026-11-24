@@ -59,7 +59,7 @@ function normalizeJob(job) {
 
 async function judge(rawJob, emit) {
   const boxId = await boxPool.acquire();
-
+  // console.log("geldim");
   try {
     return await judgeWithBox(rawJob, emit, boxId);
   } finally {
@@ -69,7 +69,7 @@ async function judge(rawJob, emit) {
 
 // emit(event): publish progress (Kafka). boxId: sandbox slot owned by this run.
 async function judgeWithBox(rawJob, emit, boxId = 0) {
-  // console.log(job);
+  // console.log("geldim");
   const job = normalizeJob(rawJob);
   // console.log("normal job", job);
 

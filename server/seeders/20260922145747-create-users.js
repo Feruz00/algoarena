@@ -46,68 +46,68 @@ module.exports = {
       bio: `Software engineer`,
     }));
 
-    // const names = ["Myrat", "Begenç", "Dovran", "Hoja", "Ata"];
-    // const surnames = [
-    //   "Geldimyradow",
-    //   "Nuryýew",
-    //   "Türkmenow",
-    //   "Şükürow",
-    //   "Serdarow",
-    //   "Annagulyýew",
-    // ];
+    const names = ["Myrat", "Begenç", "Dovran", "Hoja", "Ata"];
+    const surnames = [
+      "Geldimyradow",
+      "Nuryýew",
+      "Türkmenow",
+      "Şükürow",
+      "Serdarow",
+      "Annagulyýew",
+    ];
 
-    // const namesLength = names.length;
-    // const surnamesLength = surnames.length;
+    const namesLength = names.length;
+    const surnamesLength = surnames.length;
 
-    // let k = 50;
+    let k = 50;
 
-    // while (k--) {
-    //   const surname = surnames[Math.floor(Math.random() * surnamesLength)];
-    //   const name = names[Math.floor(Math.random() * namesLength)];
-    //   const fullName = `${surname} ${name}`;
-    //   const username = `${turkmenToLatin(surname)}_${turkmenToLatin(name)}_${k}`;
+    while (k--) {
+      const surname = surnames[Math.floor(Math.random() * surnamesLength)];
+      const name = names[Math.floor(Math.random() * namesLength)];
+      const fullName = `${surname} ${name}`;
+      const username = `${turkmenToLatin(surname)}_${turkmenToLatin(name)}_${k}`;
 
-    //   users.push({
-    //     fullName: fullName,
-    //     username: username,
-    //     password: password,
-    //     roleId: 3,
-    //     email: `${username}@gmail.com`,
-    //     github: `${username}-dev`,
-    //     organization: "S.Seydi adyndaky TDMI",
-    //     website: `${username}.dev.com`,
-    //     bio: `Software engineer`,
-    //     status: "active",
-    //     createdAt: new Date(),
-    //     updatedAt: new Date(),
-    //   });
-    // }
+      users.push({
+        fullName: fullName,
+        username: username,
+        password: password,
+        roleId: 3,
+        email: `${username}@gmail.com`,
+        github: `${username}-dev`,
+        organization: "S.Seydi adyndaky TDMI",
+        website: `${username}.dev.com`,
+        bio: `Software engineer`,
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
 
-    // for (let group = 501; group <= 506; group++) {
-    //   k = 15;
-    //   while (k--) {
-    //     const surname = surnames[Math.floor(Math.random() * surnamesLength)];
-    //     const name = names[Math.floor(Math.random() * namesLength)];
-    //     const fullName = `${surname} ${name}`;
-    //     const username = `${group}_${k}`;
+    for (let group = 501; group <= 506; group++) {
+      k = 15;
+      while (k--) {
+        const surname = surnames[Math.floor(Math.random() * surnamesLength)];
+        const name = names[Math.floor(Math.random() * namesLength)];
+        const fullName = `${surname} ${name}`;
+        const username = `${group}_${k}`;
 
-    //     users.push({
-    //       fullName: fullName,
-    //       username: username,
-    //       password: password,
-    //       email: `${username}@gmail.com`,
-    //       github: `${username}-dev`,
-    //       organization: "S.Seydi adyndaky TDMI",
-    //       website: `${username}.dev.com`,
-    //       bio: `Software engineer`,
+        users.push({
+          fullName: fullName,
+          username: username,
+          password: password,
+          email: `${username}@gmail.com`,
+          github: `${username}-dev`,
+          organization: "S.Seydi adyndaky TDMI",
+          website: `${username}.dev.com`,
+          bio: `Software engineer`,
 
-    //       roleId: 4,
-    //       status: "active",
-    //       createdAt: new Date(),
-    //       updatedAt: new Date(),
-    //     });
-    //   }
-    // }
+          roleId: 4,
+          status: "active",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    }
 
     await queryInterface.bulkInsert("tbl_users", users, {});
   },
