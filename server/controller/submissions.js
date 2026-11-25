@@ -35,16 +35,18 @@ const createSubmission = catchAsync(async (req, res, next) => {
       {
         model: TestGroups,
         as: "testGroups",
+        separate: true,
+        order: [["order", "ASC"]],
         include: [
           {
             model: TestCases,
             as: "testCases",
+            separate: true,
+            order: [["order", "ASC"]],
           },
         ],
       },
     ],
-    sort: [["testGroups.order", "asc"]],
-    sort: [["testGroups.testCases.order", "asc"]],
   });
 
   if (!problem) return next(new AppError("Problem not found!", 404));
