@@ -219,7 +219,7 @@ const AdminLayout = () => {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-center text-white text-xl font-bold border-b border-gray-700">
-          {collapsed ? "" : "Çözgüt"}
+          {collapsed ? "" : "AlgoArena"}
         </div>
 
         {/* Navigation */}
